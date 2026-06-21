@@ -1,5 +1,16 @@
 <?php
 require_once 'db.php';
+if(isset($_GET["id"]))
+    {
+        $id = $_GET["id"];
+        $stm = $pdo->prepare(
+        "UPDATE doctors
+        SET available=IF(available='y','n','y')
+        WHERE id = ?
+        "
+        );
+        $stm->execute([$id]);
+    }
 if(isset($_POST["logout"]))
     { 
         header("Location:admin.php");
@@ -44,7 +55,30 @@ if($user)
 <html>
     <head>
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-</head>
+     <link rel="stylesheet" href="admin_view.css">
+
+     <script>
+        function chnge(id)
+        {
+            var btn = document.getElementById("toggle_"+id);
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function()
+            { 
+                if(this.readyState == 4 && this.status == 200)
+            {
+               btn.classList.toggle("btn-success");
+               btn.classList.toggle("btn-warning");
+
+               btn.innerHTML = btn.innerHTML == "y" ? "n" : "y";
+            }
+}
+xmlhttp.open('GET','admin_view.php?id='+id,true);
+xmlhttp.send();
+           
+            
+        }
+     </script>
+     </head>
    <form method="post">
    <button class="btn btn-primary" type="submit" name="logout">Logout</button>
    </form>
@@ -53,33 +87,7 @@ if($user)
 </html>
  <!-- style  -->
 
-<style>
-table {
-    border-collapse: collapse;
-    width: 80%;
-    
-    font-family: Arial, sans-serif;
-}
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
-}
-
-th {
-    background-color: #4CAF50;
-    color: white;
-}
-
-tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
-
-tr:hover {
-    background-color: #ddd;
-}
-</style>
 <?php
 echo "<h2>registered Patients</h2>";
 $stmt = 
@@ -120,6 +128,7 @@ if($res->rowCount() >0)
 <h2>Doctors details</h2>
 </html>
 <?php
+
 $stmt = 
     "SELECT * FROM doctors";
 
@@ -136,11 +145,14 @@ if($res->rowCount() >0)
         ";
         while($row=$res->fetch())
             {
+                $clss = ($row["available"]=='y')?"btn-success":"btn-warning";
                 echo "<tr>";
                 echo "<td>".$row["name"]."</td>";
                 echo "<td>".$row["specialization"]."</td>";
                 echo "<td>".$row["fee"]."</td>";
-                echo "<td>".$row["available"]."</td>";
+                echo "<td><button id='toggle_".$row['id']."'
+                onclick='chnge(".$row['id'].")' class='btn ".$clss."'>"
+               .$row["available"]."</button></td>";
             }
             echo "</table>";
            
