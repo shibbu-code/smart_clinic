@@ -13,5 +13,8 @@
     <a href="admin.php">
         <button class="btn btn-primary">Admin</button>
     </a>
+    <a href="book_appointment.php">
+        <button class="btn btn-primary" >Patient</button>
+    </a>
 </body>
 </html>
