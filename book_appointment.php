@@ -9,7 +9,7 @@ require_once 'db.php';
     <title>Document</title>
 </head>
 <body>
-    <h2>Book your appointment</h2>
+    <h2>Book appointment</h2>
     <br>
     <form action="<?php echo $_SERVER["PHP_SELF"]?>" method="post">
 
@@ -72,9 +72,12 @@ if(isset($_POST["name"]))
            (name, dob, gender, blood_group, phone, address, requirement)
            values (?,?,?,?,?,?,?) "
           );
+          
           $stmt->execute([$_POST["name"],$_POST["dob"],
+         
           $_POST["gender"],$_POST["blood_group"],$_POST["phone"],
           $_POST["address"],$_POST["requirement"]]);
+        
            echo "<script> alert('your requet has been submitted succesfully')</script>";
     }
     else{

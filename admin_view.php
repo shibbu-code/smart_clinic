@@ -36,13 +36,17 @@ if($user)
        
     }
     else{
-        echo "error";
+        echo "<script>alert('Invalid Credentials')
+        window.location.href='index.php'
+        </script>";
+        
+        exit();
     }
     }
 ?>
 <html>
 
-<a href="register_patient.php">
+<a href="book_appointment.php">
     <button>Register Patient</button>
     
 </a><br><br>
@@ -72,21 +76,97 @@ if($user)
                btn.innerHTML = btn.innerHTML == "y" ? "n" : "y";
             }
 }
-xmlhttp.open('GET','admin_view.php?id='+id,true);
-xmlhttp.send();
+                xmlhttp.open('GET','admin_view.php?id='+id,true);
+                xmlhttp.send();
            
             
         }
+
+// functioon for request view
+function view()
+{
+    
+    var card = document.getElementById("crd");
+    card.classList.toggle("d-none");
+   card.classList.toggle("d-block");
+}
+// accept 
+function accept_req(id)
+{
+    var patient = document.getElementById("req_"+id);
+    patient.classList.remove("btn-warning");
+    patient.classList.add("btn-success");
+    
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange=function(){
+        if(this.readyState==4 && this.status==200)
+        {
+            patient.innerText = 'accepted';
+        }
+    }
+    xmlhttp.open('GET','update_ptdb.php?id='+id,true);
+    xmlhttp.send();
+}
+        
+
      </script>
      </head>
+     <br>
+     <button class="btn btn-primary mt-2" onclick="view()">Appointment Requests</button>
+     <br>
    <form method="post">
-   <button class="btn btn-primary" type="submit" name="logout">Logout</button>
+   <button class="btn btn-primary mt-2" type="submit" name="logout">Logout</button>
    </form>
    <br>
    <br>
 </html>
  <!-- style  -->
 
+ <!-- card for requests  -->
+<html>
+
+<div class="card d-none ml-5" id="crd" style="width: 22rem;">
+<div card-header>
+    Appointment Requests
+</div>
+<div class="card-body">
+    
+    <?php
+          $sql = "select * from patients where status = 'pending'";
+          $res = $pdo->query($sql);
+          if($res->rowCount()>0)
+            {
+                echo "<table><tr>
+                <th>patient_id</th>
+                <th>name</th>
+                <th>status</th>
+                </tr>";
+                while($row = $res->fetch())
+                  {
+                    echo "<tr>";
+                    echo "<td>".$row["id"]."</td>";
+                    echo "<td>".$row["name"]."</td>";
+                    echo "<td>
+                    <button id='req_".$row['id']."'
+                class='btn btn-warning'
+                onclick='accept_req(".$row['id'].")'>
+            ".$row['status']."
+        </button>
+      </td>";
+                    echo "</tr>";
+                  }
+                  echo "</table>";
+            }
+            else
+                {
+                    echo " no results here";
+                }
+    ?>
+    
+</div>
+<button class="btn btn-outline-info justify-content-center" onclick="view()">close</button>
+</div>
+</html>
 
 <?php
 echo "<h2>registered Patients</h2>";
@@ -102,6 +182,7 @@ if($res->rowCount() >0)
         <th>Gender</th>
         <th>Blood_group</th>
         <th>DOB</th>
+        <th>Requirement</th>
         </tr>
         ";
         while($row=$res->fetch())
@@ -111,6 +192,7 @@ if($res->rowCount() >0)
                 echo "<td>".$row["gender"]."</td>";
                 echo "<td>".$row["blood_group"]."</td>";
                 echo "<td>".$row["dob"]."</td>";
+                echo "<td>".$row["requirement"]."</td>";
             }
            echo"</table>";
          
@@ -166,5 +248,9 @@ if($res->rowCount() >0)
    
 
 ?>
-<!-- for doctor list -->
+
+<!-- dynamic requests view -->
+<?php
+
+?>
 
